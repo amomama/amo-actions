@@ -1,0 +1,35 @@
+name: 'Sync ArgoCD Application'
+description: 'Sync ArgoCD Application.'
+
+inputs:
+  argo-server:
+    description: 'ArgoCD server address.'
+    required: true
+  app-name:
+    description: 'Application name to execute action on.'
+    required: true
+  cli-version:
+    description: 'ArgoCD CLI version'
+    required: true
+  auth-token:
+    description: 'ArgoCD Token.'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Sync ArgoCD Application
+      continue-on-error: true
+      run: |
+        sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v${{ inputs.cli-version }}/argocd-linux-amd64 &&
+        sudo chmod +x /usr/local/bin/argocd &&
+        echo &&
+        echo "ArgoCLI Version:"; echo "${{ inputs.cli-version }}" | sed 's/./& /g'
+        for i in $(seq 1 5);
+        do
+          echo
+          echo "Attempt $i"
+          echo
+          argocd app wait ${{ inputs.app-name }} --operation --insecure --auth-token ${{ inputs.auth-token }} --server ${{ inputs.argo-server }} && argocd app sync ${{ inputs.app-name }} --insecure --auth-token ${{ inputs.auth-token }} --server ${{ inputs.argo-server }} && argocd app wait ${{ inputs.app-name }} --health --insecure --auth-token ${{ inputs.auth-token }} --server ${{ inputs.argo-server }} && s=0 && break || s=$?;
+        done; (exit $s)
+      shell: bash
