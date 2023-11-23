@@ -36,5 +36,6 @@ jobs:
 ```
 
 In the example above, the action checks out the code and then sends a message to the specified Slack channel.
-This action operates as a composite, relying on [action-slack](https://github.com/8398a7/action-slack/). The content of the message is determined based on the deployment status.
+This action operates as a composite, relying on [action-slack](https://github.com/8398a7/action-slack/). The content of the message is determined based on the deployment status:
 
+<img src="https://github.com/amomama/amo-actions/assets/85172571/fd019a34-1503-4a6b-af8d-ea029dd5e571" width="500"/>
