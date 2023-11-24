@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Sync ArgoCD Application
-        uses: your-repo/sync-argocd-action@v1
+        uses: your-repo/sync-argocd-action@v2
         with:
           cli-version: '2.0.1'
           app-name: 'my-argocd-app'
