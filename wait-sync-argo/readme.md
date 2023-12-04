@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync ArgoCD Application
-        uses: your-repo/sync-argocd-action@v2
+        uses: your-repo/sync-argocd-action@v3.0.1
         with:
           cli-version: '2.0.1'
           app-name: 'my-argocd-app'

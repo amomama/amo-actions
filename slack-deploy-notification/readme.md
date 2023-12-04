@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy Status Notification
-        uses: your-repo/sync-argocd-action@v2
+        uses: your-repo/sync-argocd-action@v3.0.1
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: ${{ job.status }}
