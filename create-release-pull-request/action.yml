@@ -5,8 +5,8 @@ inputs:
   gh-token:
     description: 'Authorization Bearer GH Token'
     required: true
-  body:
-    description: 'Body of the PR'
+  description:
+    description: 'Description (details) of the PR'
     required: true
 
 runs:
@@ -26,5 +26,5 @@ runs:
             "head": "stage",
             "base": "master",
             "title": "Release ${{ steps.date.outputs.date }}:",
-            "body": "${{ inputs.body }}"
+            "body": "${{ inputs.description }}"
           }'

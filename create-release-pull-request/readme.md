@@ -8,6 +8,10 @@ This GitHub Action automates the process of creating a pull request (PR) to merg
 
 The GitHub token used for authentication. This token should have the necessary permissions to create a PR.
 
+### `description` (required)
+
+Uses for filling description part of PR, e.g. name of released features, steps to check
+
 ## Example Usage
 
 ```yaml
@@ -22,6 +26,7 @@ jobs:
 
     steps:
       - name: Create Release PR
-        uses: your-repo/create-release-pr-action@v1.0.0
+        uses: your-repo/create-release-pull-request@v1.0.0
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
+          body: "Description:\n \n- [ ] Functional tests checked\n- [ ] Devices tests checked"
