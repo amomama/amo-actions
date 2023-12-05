@@ -13,7 +13,7 @@ runs:
     - name: Get current date
       id: date
       shell: bash
-      run: echo "date=$(date +'.%m.%y')" >> $GITHUB_OUTPUT
+      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Create PR
       shell: bash
@@ -22,8 +22,8 @@ runs:
         --header 'Authorization: Bearer ${{ inputs.gh-token }}' \
         --header 'Content-Type: application/json' \
         --data-raw '{
-          "head": "stage",
-          "base": "master",
-          "title": "Release ${{ steps.date.outputs.date }}:",
+          "head": "master",
+          "base": "stage",
+          "title": "master -> stage ${{ steps.date.outputs.date }}:",
           "body": "Marge master into stage after deploy"
         }'
