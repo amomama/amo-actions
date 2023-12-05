@@ -12,9 +12,11 @@ runs:
   steps:
     - name: Get current date
       id: date
+      shell: bash
       run: echo "date=$(date +'.%m.%y')" >> $GITHUB_OUTPUT
 
     - name: Create PR
+      shell: bash
       run: |
         curl --location --request POST 'https://api.github.com/repos/${{ github.repository }}/pulls' \
         --header 'Authorization: Bearer ${{ inputs.gh-token }}' \
