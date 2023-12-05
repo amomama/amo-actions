@@ -7,8 +7,9 @@ The [AMO-Publishing](https://amo.tech/company/amo-publishing) tech team is invol
 For more details on each of the actions, you can refer to the respective README linked below:
 
 1. [Create Release PR Stage To Master](https://github.com/amomama/amo-actions/tree/master/create-release-pull-request)
-2. [Sync ArgoCD Application](https://github.com/amomama/amo-actions/tree/master/wait-sync-argo)
-3. [Slack Deploy Notification](https://github.com/amomama/amo-actions/tree/master/slack-deploy-notification)
+2. [Create PR Master To Stage](https://github.com/amomama/amo-actions/tree/master/pull-master-to-stage)
+3. [Sync ArgoCD Application](https://github.com/amomama/amo-actions/tree/master/wait-sync-argo)
+4. [Slack Deploy Notification](https://github.com/amomama/amo-actions/tree/master/slack-deploy-notification)
 
 These actions can be used both individually and as part of a single workflow, providing flexibility in implementation.
 

@@ -1,23 +1,25 @@
-name: 'Create Release PR into master from stage'
-description: 'Create Release PR into master from stage'
+name: "Create Release PR into master from stage"
+description: "Create Release PR into master from stage"
 
 inputs:
   gh-token:
-    description: 'Authorization Bearer GH Token'
+    description: "Authorization Bearer GH Token"
     required: true
   description:
-    description: 'Description (details) of the PR'
+    description: "Description (details) of the PR"
     required: true
 
 runs:
-  using: 'composite'
+  using: "composite"
 
   steps:
     - name: Get current date
       id: date
+      shell: bash
       run: echo "date=$(date +'.%m.%y')" >> $GITHUB_OUTPUT
 
     - name: Create PR
+      shell: bash
       run: |
         curl --location --request POST 'https://api.github.com/repos/${{ github.repository }}/pulls' \
         --header 'Authorization: Bearer ${{ inputs.gh-token }}' \
