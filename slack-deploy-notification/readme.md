@@ -15,6 +15,9 @@ The URL of the deployed application.
 ### `get-parameter` (optional)
 An optional parameter that can be appended to the `app-url` for additional customization.
 
+### `service-name` (optional)
+An optional parameter that specify the service name if your application consists of microservices.
+
 ## Example Usage
 
 ```yaml
@@ -27,12 +30,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy Status Notification
-        uses: your-repo/sync-argocd-action@v4.0.1
+        uses: your-repo/sync-argocd-action@v4.0.2
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: ${{ job.status }}
           app-url: 'your-app-url.com'
           get-parameter: "?version=1.0"
+          service-name: "frontend"
 ```
 
 In the example above, the action checks out the code and then sends a message to the specified Slack channel.
