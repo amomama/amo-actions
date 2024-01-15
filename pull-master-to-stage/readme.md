@@ -24,6 +24,6 @@ jobs:
 
     steps:
       - name: Create PR
-        uses: your-repo/pull-master-to-stage@v4.0.1
+        uses: your-repo/pull-master-to-stage@v4.0.2
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}

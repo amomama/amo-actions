@@ -13,6 +13,8 @@ inputs:
     required: true
   get-parameter:
     description: 'An optional parameter for additional customization. If this parameter is provided, it will be added to the app-url'
+  service-name:
+    description: 'Specify the service name if your application consists of microservices'
 
 runs:
   using: 'composite'
@@ -20,10 +22,15 @@ runs:
   steps:
     - name: Define Notification Title
       run: |
+        service_name=""
+        if [ -n "${{inputs.service-name}}" ]; then
+          service_name="(${{inputs.service-name}})"
+        fi
+        
         if [ "${{inputs.status}}" = "success" ]; then
-          echo "title=The application <https://${{inputs.app-url}}${{inputs.get-parameter}}|${{inputs.app-url}}> has been successfully deployed 💚" >> $GITHUB_ENV
+          echo "title=The application <https://${{inputs.app-url}}${{inputs.get-parameter}}|${{inputs.app-url}}>${service_name} has been successfully deployed 💚" >> $GITHUB_ENV
         else
-          echo "title=The deployment of <https://${{inputs.app-url}}${{inputs.get-parameter}}|${{inputs.app-url}}> ended with an error ❤️" >> $GITHUB_ENV
+          echo "title=The deployment of <https://${{inputs.app-url}}${{inputs.get-parameter}}|${{inputs.app-url}}>${service_name} ended with an error ❤️" >> $GITHUB_ENV
         fi
       shell: bash
 
