@@ -23,7 +23,7 @@ jobs:
       - name: Remove and Add Label
         uses: your-repo/remove-add-label-action@v5.0.0
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          gh-token: ${{ secrets.GH_TOKEN }}
           label-name: 'Deployed'
 ```
 
