@@ -1,0 +1,30 @@
+name: 'Remove and Add Label'
+description: 'This action removes a label from all pull requests in a repository and adds it to the pull request that triggered the workflow'
+
+inputs:
+  gh-token:
+    description: "Authorization Bearer GH Token"
+    required: true
+  label-name:
+    description: 'The name of the label to remove and add.'
+    required: true
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Remove label from pull requests
+      shell: bash
+      run: |
+        PULL_REQUESTS=$(curl -s -H "Authorization: token ${{ inputs.gh-token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls" | jq '.[].number')
+        for PR_NUMBER in $PULL_REQUESTS; do
+          curl -X DELETE -H "Authorization: token ${{ inputs.gh-token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/labels/${{ inputs.label-name }}"
+        done
+        
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          curl -X POST -H "Authorization: token ${{ inputs.gh-token }}" \
+            -d "{\"labels\":[\"${{ inputs.label-name }}\"]}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels"
+        fi
