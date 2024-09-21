@@ -1,0 +1,26 @@
+name: Create Sentry Release
+description: 'Automatically create a Sentry release in a workflow'
+
+inputs:
+  sentry-project:
+    description: 'Project name in organization'
+    required: true
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Get current time (Kyiv)
+      id: current-time
+      run: echo "current-time=$(TZ='Europe/Kyiv' date '+%H:%M %d.%m.%y')" >> $GITHUB_ENV
+
+    - name: Create Sentry release
+      uses: getsentry/action-release@v1.7.0
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_PUBL_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_PUBL_ORG }}
+        SENTRY_PROJECT: ${{ inputs.sentry-project }}
+      with:
+        environment: production
+        version: ${{ env.current-time }}
+        started_at: ${{ steps.current_time.outputs.unix_timestamp }}
