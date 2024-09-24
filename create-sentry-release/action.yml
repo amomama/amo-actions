@@ -17,8 +17,8 @@ runs:
     - name: Create Sentry release
       uses: getsentry/action-release@v1.7.0
       env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_PUBL_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_PUBL_ORG }}
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_ORGANIC_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORGANIC_ORG }}
         SENTRY_PROJECT: ${{ inputs.sentry-project }}
       with:
         environment: production
