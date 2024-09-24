@@ -11,6 +11,7 @@ For more details on each of the actions, you can refer to the respective README 
 3. [Remove and Add Label on Pull Requests](https://github.com/amomama/amo-actions/tree/master/remove-add-label)
 4. [Sync ArgoCD Application](https://github.com/amomama/amo-actions/tree/master/wait-sync-argo)
 5. [Slack Deploy Notification](https://github.com/amomama/amo-actions/tree/master/slack-deploy-notification)
+6. [Create Sentry Release](https://github.com/amomama/amo-actions/tree/master/create-sentry-release)
 
 These actions can be used both individually and as part of a single workflow, providing flexibility in implementation.
 

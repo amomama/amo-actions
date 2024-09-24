@@ -18,6 +18,7 @@ runs:
   steps:
     - name: Get current time (Kyiv)
       id: current-time
+      shell: bash
       run: echo "current-time=$(TZ='Europe/Kyiv' date '+%H:%M %d.%m.%y')" >> $GITHUB_ENV
 
     - name: Create Sentry release
