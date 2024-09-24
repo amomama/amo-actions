@@ -20,5 +20,7 @@ jobs:
       - name: Create Sentry Release
         uses: amomama/amo-actions/create-sentry-release@v5.0.0
         with:
-          service-name: 'measuremonitor'
+          project: 'measuremonitor'
+          auth-token:
+          org:
 ```

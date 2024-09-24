@@ -2,8 +2,14 @@ name: Create Sentry Release
 description: 'Automatically create a Sentry release in a workflow'
 
 inputs:
-  sentry-project:
+  project:
     description: 'Project name in organization'
+    required: true
+  auth-token:
+    description: 'Auth token'
+    required: true
+  org:
+    description: 'Org name in organization'
     required: true
 
 runs:
@@ -17,9 +23,9 @@ runs:
     - name: Create Sentry release
       uses: getsentry/action-release@v1.7.0
       env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_ORGANIC_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_ORGANIC_ORG }}
-        SENTRY_PROJECT: ${{ inputs.sentry-project }}
+        SENTRY_AUTH_TOKEN: ${{ inputs.auth-token }}
+        SENTRY_ORG: ${{ inputs.org }}
+        SENTRY_PROJECT: ${{ inputs.project }}
       with:
         environment: production
         version: ${{ env.current-time }}
