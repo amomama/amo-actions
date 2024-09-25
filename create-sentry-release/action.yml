@@ -11,6 +11,9 @@ inputs:
   org:
     description: 'Org name in organization'
     required: true
+  env:
+    description: 'Environment: stage or prod'
+    required: true
 
 runs:
   using: 'composite'
@@ -28,6 +31,6 @@ runs:
         SENTRY_ORG: ${{ inputs.org }}
         SENTRY_PROJECT: ${{ inputs.project }}
       with:
-        environment: production
+        environment: ${{ inputs.env }}
         version: ${{ env.current-time }}
         started_at: ${{ steps.current_time.outputs.unix_timestamp }}
