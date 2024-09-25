@@ -21,6 +21,7 @@ jobs:
         uses: amomama/amo-actions/create-sentry-release@v5.0.0
         with:
           project: 'measuremonitor'
+          env: 'prod'
           auth-token:
           org:
 ```
