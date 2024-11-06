@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Remove and Add Label
-        uses: your-repo/remove-add-label-action@v5.0.0
+        uses: your-repo/remove-add-label-action@v6.0.4
         with:
           gh-token: ${{ secrets.GH_TOKEN }}
           label-name: 'Deployed'

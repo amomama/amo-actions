@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Create Release PR
-        uses: your-repo/create-release-pull-request@v5.0.0
+        uses: your-repo/create-release-pull-request@v6.0.4
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
           description: "Description:\n \n- [ ] Functional tests checked\n- [ ] Devices tests checked"

@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create Sentry Release
-        uses: amomama/amo-actions/create-sentry-release@v5.0.0
+        uses: amomama/amo-actions/create-sentry-release@v6.0.4
         with:
           project: 'measuremonitor'
           env: 'prod'
