@@ -35,7 +35,7 @@ runs:
       shell: bash
 
     - name: Send Slack Notification
-      uses: 8398a7/action-slack@v3.15.1
+      uses: 8398a7/action-slack@v3.16.2
       with:
         status: custom
         custom_payload: |
