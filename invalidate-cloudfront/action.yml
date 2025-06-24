@@ -1,0 +1,45 @@
+name: "Invalidate CloudFront"
+description: "Invalidate CloudFront with retries"
+
+inputs:
+  distribution:
+    description: "CloudFront Distribution ID"
+    required: true
+  retrying:
+    description: "Retrying count"
+    required: false
+    default: 1
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install AWS CLI
+      shell: bash
+      run: |
+        if ! command -v aws &> /dev/null; then
+          echo "Installing AWS CLI..."
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+        else
+          echo "AWS CLI already installed"
+        fi
+
+    - name: Invalidate CloudFront with retries
+      shell: bash
+      run: |
+        for i in $(seq 1 ${{ inputs.retrying }}); do
+          echo "Attempt #$i"
+          if aws cloudfront create-invalidation \
+            --distribution-id ${{ inputs.distribution }} \
+            --paths "/*"; then
+            echo "Invalidation succeeded"
+            exit 0
+          else
+            echo "Failed, retrying in $((i * 10)) seconds..."
+            sleep $((i * 10))
+          fi
+        done
+        echo "All attempts failed. Exiting with error."
+        exit 1
