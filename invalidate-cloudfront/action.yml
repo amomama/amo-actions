@@ -28,8 +28,8 @@ runs:
     - name: Invalidate CloudFront Distributions
       shell: bash
       run: |
-        distributions=$(echo "${{ inputs.distribution }}" | tr ',' ' ')
-        echo "📦 Distributions to invalidate (in parallel):"
+        distributions=$(echo "${{ inputs.distribution }}" | tr ',\n' ' ' | tr -s ' ')
+        echo "Distributions to invalidate (in parallel):"
         echo "$distributions"
 
         failed=()
