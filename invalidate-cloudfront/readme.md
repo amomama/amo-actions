@@ -17,7 +17,7 @@
 ### For one
 ```
 - name: Invalidate CloudFront
-  uses: your-org/your-repo/.github/actions/invalidate-cloudfront@main
+  uses: your-org/your-repo/.github/actions/invalidate-cloudfront@v8.0.0
   with:
     distribution: E2M8ILOBF84EDF
     retrying: 3
