@@ -4,10 +4,10 @@
 
 ```
   distribution:
-    description: "CloudFront Distribution ID"
+    description: "CloudFront Distribution ID or multiple IDs separated by comma/space/newline"
     required: true
   retrying:
-    description: "Retrying count"
+    description: "Retry count per distribution"
     required: false
     default: 1
 ```
