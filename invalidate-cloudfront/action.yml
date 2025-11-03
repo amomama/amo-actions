@@ -3,7 +3,7 @@ description: "Invalidate one or multiple CloudFront distributions with retries"
 
 inputs:
   distribution:
-    description: "CloudFront Distribution ID or multiple IDs separated by comma/space"
+    description: "CloudFront Distribution ID or multiple IDs separated by comma/space/newline"
     required: true
   retrying:
     description: "Retry count per distribution"
@@ -29,36 +29,44 @@ runs:
       shell: bash
       run: |
         distributions=$(echo "${{ inputs.distribution }}" | tr ',' ' ')
-        echo "Distributions to invalidate: $distributions"
+        echo "📦 Distributions to invalidate (in parallel):"
+        echo "$distributions"
 
-        any_failed=false
+        failed=()
 
-        for dist_id in $distributions; do
-          echo "Starting invalidation for distribution: $dist_id"
-          success=false
-
+        invalidate_distribution() {
+          local dist_id=$1
+          echo "Starting invalidation for $dist_id"
           for i in $(seq 1 ${{ inputs.retrying }}); do
             echo "Attempt #$i for $dist_id"
             if aws cloudfront create-invalidation \
               --distribution-id "$dist_id" \
-              --paths "/*"; then
+              --paths "/*" \
+              --caller-reference "$(date +%s)-$dist_id-$i"; then
               echo "Invalidation succeeded for $dist_id"
-              success=true
-              break
+              return 0
             else
               echo "Failed attempt #$i for $dist_id, retrying in $((i * 10)) seconds..."
               sleep $((i * 10))
             fi
           done
+          echo "All attempts failed for $dist_id"
+          failed+=("$dist_id")
+          return 1
+        }
 
-          if [ "$success" = false ]; then
-            echo "All attempts failed for $dist_id"
-            any_failed=true
-          fi
+        export -f invalidate_distribution
+        export failed
+
+        for dist_id in $distributions; do
+          invalidate_distribution "$dist_id" &
         done
 
-        if [ "$any_failed" = true ]; then
-          echo "Some invalidations failed. Exiting with error."
+        wait
+
+        if [ "${#failed[@]}" -gt 0 ]; then
+          echo "Some invalidations failed:"
+          printf ' - %s\n' "${failed[@]}"
           exit 1
         fi
 
