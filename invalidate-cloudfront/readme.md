@@ -14,10 +14,39 @@
 
 ## Example Usage
 
+### For one
 ```
 - name: Invalidate CloudFront
   uses: your-org/your-repo/.github/actions/invalidate-cloudfront@main
   with:
-    distribution-id: E2M8ILOBF84EDF
+    distribution: E2M8ILOBF84EDF
+    retrying: 3
+```
+
+### For many
+```
+- name: Invalidate CloudFront
+  uses: your-org/your-repo/.github/actions/invalidate-cloudfront@v8.0.0
+  with:
+    distribution: "EPIJXYZ88VKBF E1ABCDEF999999 E3EXAMPLE888888"
+    retrying: 3
+```
+OR
+```
+- name: Invalidate CloudFront
+  uses: your-org/your-repo/.github/actions/invalidate-cloudfront@v8.0.0
+  with:
+    distribution: "EPIJXYZ88VKBF,E1ABCDEF999999,E3EXAMPLE888888"
+    retrying: 3
+```
+OR
+```
+- name: Invalidate multiple CloudFront
+  uses: amomama/amo-actions/invalidate-cloudfront@v8.0.0
+  with:
+    distribution: |
+        EPIJXYZ88VKBF
+        E1ABCDEF999999
+        E3EXAMPLE888888
     retrying: 3
 ```

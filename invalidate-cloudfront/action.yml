@@ -1,45 +1,65 @@
 name: "Invalidate CloudFront"
-description: "Invalidate CloudFront with retries"
+description: "Invalidate one or multiple CloudFront distributions with retries"
 
 inputs:
   distribution:
-    description: "CloudFront Distribution ID"
+    description: "CloudFront Distribution ID or multiple IDs separated by comma/space"
     required: true
   retrying:
-    description: "Retrying count"
+    description: "Retry count per distribution"
     required: false
     default: 1
 
 runs:
   using: "composite"
-
   steps:
     - name: Install AWS CLI
       shell: bash
       run: |
         if ! command -v aws &> /dev/null; then
           echo "Installing AWS CLI..."
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip -q awscliv2.zip
           sudo ./aws/install
         else
           echo "AWS CLI already installed"
         fi
 
-    - name: Invalidate CloudFront with retries
+    - name: Invalidate CloudFront Distributions
       shell: bash
       run: |
-        for i in $(seq 1 ${{ inputs.retrying }}); do
-          echo "Attempt #$i"
-          if aws cloudfront create-invalidation \
-            --distribution-id ${{ inputs.distribution }} \
-            --paths "/*"; then
-            echo "Invalidation succeeded"
-            exit 0
-          else
-            echo "Failed, retrying in $((i * 10)) seconds..."
-            sleep $((i * 10))
+        distributions=$(echo "${{ inputs.distribution }}" | tr ',' ' ')
+        echo "Distributions to invalidate: $distributions"
+
+        any_failed=false
+
+        for dist_id in $distributions; do
+          echo "Starting invalidation for distribution: $dist_id"
+          success=false
+
+          for i in $(seq 1 ${{ inputs.retrying }}); do
+            echo "Attempt #$i for $dist_id"
+            if aws cloudfront create-invalidation \
+              --distribution-id "$dist_id" \
+              --paths "/*"; then
+              echo "Invalidation succeeded for $dist_id"
+              success=true
+              break
+            else
+              echo "Failed attempt #$i for $dist_id, retrying in $((i * 10)) seconds..."
+              sleep $((i * 10))
+            fi
+          done
+
+          if [ "$success" = false ]; then
+            echo "All attempts failed for $dist_id"
+            any_failed=true
           fi
         done
-        echo "All attempts failed. Exiting with error."
-        exit 1
+
+        if [ "$any_failed" = true ]; then
+          echo "Some invalidations failed. Exiting with error."
+          exit 1
+        fi
+
+        echo "All invalidations completed successfully!"
