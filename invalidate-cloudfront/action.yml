@@ -13,17 +13,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install AWS CLI
+    - name: Install AWS CLI v2
       shell: bash
       run: |
-        if ! command -v aws &> /dev/null; then
-          echo "Installing AWS CLI..."
-          curl -sS "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip -q awscliv2.zip
-          sudo ./aws/install
-        else
-          echo "AWS CLI already installed"
-        fi
+        echo "Installing AWS CLI v2..."
+        sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws || true
+        curl -sS "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip -q awscliv2.zip
+        sudo ./aws/install --update
+        aws --version
 
     - name: Invalidate CloudFront Distributions
       shell: bash
