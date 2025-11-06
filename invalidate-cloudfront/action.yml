@@ -1,45 +1,73 @@
 name: "Invalidate CloudFront"
-description: "Invalidate CloudFront with retries"
+description: "Invalidate one or multiple CloudFront distributions with retries"
 
 inputs:
   distribution:
-    description: "CloudFront Distribution ID"
+    description: "CloudFront Distribution ID or multiple IDs separated by comma/space/newline"
     required: true
   retrying:
-    description: "Retrying count"
+    description: "Retry count per distribution"
     required: false
     default: 1
 
 runs:
   using: "composite"
-
   steps:
     - name: Install AWS CLI
       shell: bash
       run: |
         if ! command -v aws &> /dev/null; then
           echo "Installing AWS CLI..."
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          curl -sS "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip -q awscliv2.zip
           sudo ./aws/install
         else
           echo "AWS CLI already installed"
         fi
 
-    - name: Invalidate CloudFront with retries
+    - name: Invalidate CloudFront Distributions
       shell: bash
       run: |
-        for i in $(seq 1 ${{ inputs.retrying }}); do
-          echo "Attempt #$i"
-          if aws cloudfront create-invalidation \
-            --distribution-id ${{ inputs.distribution }} \
-            --paths "/*"; then
-            echo "Invalidation succeeded"
-            exit 0
-          else
-            echo "Failed, retrying in $((i * 10)) seconds..."
-            sleep $((i * 10))
-          fi
+        distributions=$(echo "${{ inputs.distribution }}" | tr ',\n' ' ' | tr -s ' ')
+        echo "Distributions to invalidate (in parallel):"
+        echo "$distributions"
+
+        failed=()
+
+        invalidate_distribution() {
+          local dist_id=$1
+          echo "Starting invalidation for $dist_id"
+          for i in $(seq 1 ${{ inputs.retrying }}); do
+            echo "Attempt #$i for $dist_id"
+            if aws cloudfront create-invalidation \
+              --distribution-id "$dist_id" \
+              --paths "/*" \
+              --caller-reference "$(date +%s)-$dist_id-$i"; then
+              echo "Invalidation succeeded for $dist_id"
+              return 0
+            else
+              echo "Failed attempt #$i for $dist_id, retrying in $((i * 10)) seconds..."
+              sleep $((i * 10))
+            fi
+          done
+          echo "All attempts failed for $dist_id"
+          failed+=("$dist_id")
+          return 1
+        }
+
+        export -f invalidate_distribution
+        export failed
+
+        for dist_id in $distributions; do
+          invalidate_distribution "$dist_id" &
         done
-        echo "All attempts failed. Exiting with error."
-        exit 1
+
+        wait
+
+        if [ "${#failed[@]}" -gt 0 ]; then
+          echo "Some invalidations failed:"
+          printf ' - %s\n' "${failed[@]}"
+          exit 1
+        fi
+
+        echo "All invalidations completed successfully!"
