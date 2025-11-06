@@ -13,24 +13,19 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install AWS CLI v2
+    - name: Show AWS CLI version
       shell: bash
       run: |
-        echo "Installing AWS CLI v2..."
-        sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/bin/aws || true
-        curl -sS "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip -q awscliv2.zip
-        sudo ./aws/install --update
-        /usr/local/bin/aws --version
+        echo "Using preinstalled AWS CLI version:"
+        aws --version || (echo "AWS CLI not found"; exit 1)
 
     - name: Invalidate CloudFront Distributions (parallel)
       shell: bash
       run: |
         set -e
-        export PATH="/usr/local/bin:$PATH"
 
         distributions=$(echo "${{ inputs.distribution }}" | tr ',\n' ' ' | tr -s ' ')
-        echo "📦 Distributions to invalidate (in parallel):"
+        echo "Distributions to invalidate (in parallel):"
         echo "$distributions"
 
         mkdir -p /tmp/cf_invalidation
@@ -41,10 +36,10 @@ runs:
           echo "🚀 Starting invalidation for $dist_id"
           for i in $(seq 1 ${{ inputs.retrying }}); do
             echo "Attempt #$i for $dist_id"
-            if /usr/local/bin/aws cloudfront create-invalidation \
+            if aws cloudfront create-invalidation \
               --distribution-id "$dist_id" \
               --paths "/*" \
-              --caller-reference "$(date +%s)-$dist_id-$i" >/dev/null 2>&1; then
+              --caller-reference "$(date +%s)-$dist_id-$i"; then
               echo "Invalidation succeeded for $dist_id"
               echo "success" > "/tmp/cf_invalidation/$dist_id"
               return 0
