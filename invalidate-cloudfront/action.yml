@@ -1,5 +1,5 @@
 name: "Invalidate CloudFront"
-description: "Invalidate one or multiple CloudFront distributions with retries"
+description: "Invalidate one or multiple CloudFront distributions in parallel with retries"
 
 inputs:
   distribution:
@@ -23,14 +23,15 @@ runs:
         sudo ./aws/install --update
         aws --version
 
-    - name: Invalidate CloudFront Distributions
+    - name: Invalidate CloudFront Distributions (parallel)
       shell: bash
       run: |
         distributions=$(echo "${{ inputs.distribution }}" | tr ',\n' ' ' | tr -s ' ')
-        echo "Distributions to invalidate (in parallel):"
+        echo "📦 Distributions to invalidate (in parallel):"
         echo "$distributions"
 
-        failed=()
+        mkdir -p /tmp/cf_invalidation
+        rm -f /tmp/cf_invalidation/*
 
         invalidate_distribution() {
           local dist_id=$1
@@ -40,8 +41,9 @@ runs:
             if aws cloudfront create-invalidation \
               --distribution-id "$dist_id" \
               --paths "/*" \
-              --caller-reference "$(date +%s)-$dist_id-$i"; then
+              --caller-reference "$(date +%s)-$dist_id-$i" >/dev/null; then
               echo "Invalidation succeeded for $dist_id"
+              echo "success" > "/tmp/cf_invalidation/$dist_id"
               return 0
             else
               echo "Failed attempt #$i for $dist_id, retrying in $((i * 10)) seconds..."
@@ -49,22 +51,22 @@ runs:
             fi
           done
           echo "All attempts failed for $dist_id"
-          failed+=("$dist_id")
+          echo "failed" > "/tmp/cf_invalidation/$dist_id"
           return 1
         }
 
         export -f invalidate_distribution
-        export failed
 
         for dist_id in $distributions; do
-          invalidate_distribution "$dist_id" &
+          bash -c "invalidate_distribution $dist_id" &
         done
 
         wait
 
-        if [ "${#failed[@]}" -gt 0 ]; then
+        echo "Checking results..."
+        if grep -q "failed" /tmp/cf_invalidation/* 2>/dev/null; then
           echo "Some invalidations failed:"
-          printf ' - %s\n' "${failed[@]}"
+          grep -l "failed" /tmp/cf_invalidation/* | sed 's|.*/||'
           exit 1
         fi
 
