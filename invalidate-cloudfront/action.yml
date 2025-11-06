@@ -13,7 +13,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Upgrade AWS CLI
+    - name: Install AWS CLI v2
       shell: bash
       run: |
         curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -21,7 +21,7 @@ runs:
         sudo ./aws/install --update
         aws --version
 
-    - name: Invalidate CloudFront Distributions (parallel)
+    - name: Invalidate CloudFront Distributions
       shell: bash
       run: |
         set -e
