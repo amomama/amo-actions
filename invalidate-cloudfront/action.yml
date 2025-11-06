@@ -35,13 +35,12 @@ runs:
 
         invalidate_distribution() {
           local dist_id=$1
-          echo "🚀 Starting invalidation for $dist_id"
+          echo "Starting invalidation for $dist_id"
           for i in $(seq 1 ${{ inputs.retrying }}); do
             echo "Attempt #$i for $dist_id"
             if aws cloudfront create-invalidation \
               --distribution-id "$dist_id" \
-              --paths "/*" \
-              --caller-reference "$(date +%s)-$dist_id-$i"; then
+              --paths "/*"; then
               echo "Invalidation succeeded for $dist_id"
               echo "success" > "/tmp/cf_invalidation/$dist_id"
               return 0
